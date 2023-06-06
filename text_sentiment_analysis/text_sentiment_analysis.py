@@ -32,17 +32,31 @@ class SentimentNetwork:
         hidden_nodes=10,
         learning_rate=0.1,
     ):
-        """Create a SentimenNetwork with the given settings
-        Args:
-            reviews(list) - List of reviews used for training
-            labels(list) - List of POSITIVE/NEGATIVE labels associated with the given reviews
-            min_count(int) - Words should only be added to the vocabulary
-                             if they occur more than this many times
-            polarity_cutoff(float) - The absolute value of a word's positive-to-negative
-                                     ratio must be at least this big to be considered.
-            hidden_nodes(int) - Number of nodes to create in the hidden layer
-            learning_rate(float) - Learning rate to use while training
+        """
+        A class representing a basic feed-forward neural network for sentiment analysis.
 
+        Args:
+            reviews (List[str]): List of reviews used for training.
+            labels (List[str]): List of POSITIVE/NEGATIVE labels associated with the reviews.
+            min_count (int, optional): Words should be added to the vocabulary only if they occur more than this many times. Defaults to 10.
+            polarity_cutoff (float, optional): The absolute value of a word's positive-to-negative ratio must be at least this big to be considered. Defaults to 0.1.
+            hidden_nodes (int, optional): Number of nodes to create in the hidden layer. Defaults to 10.
+            learning_rate (float, optional): Learning rate to use while training. Defaults to 0.1.
+
+        Attributes:
+            input_nodes (int): Number of nodes in the input layer.
+            hidden_nodes (int): Number of nodes in the hidden layer.
+            output_nodes (int): Number of nodes in the output layer.
+            learning_rate (float): Learning rate for the network.
+            weights_0_1 (np.array): Weights between the input layer and the hidden layer.
+            weights_1_2 (np.array): Weights between the hidden layer and the output layer.
+            layer_1 (np.array): Hidden layer in the network.
+            word2index (Dict[str, int]): Mapping of words to their corresponding index in the vocabulary.
+            label2index (Dict[str, int]): Mapping of labels to their corresponding index.
+            review_vocab (List[str]): List of words in the reviews' vocabulary.
+            review_vocab_size (int): Size of the reviews' vocabulary.
+            label_vocab (List[str]): List of labels in the vocabulary.
+            label_vocab_size (int): Size of the labels' vocabulary.
         """
         np.random.seed(1)
 
@@ -52,8 +66,13 @@ class SentimentNetwork:
 
     def pre_process_data(self, reviews, labels, polarity_cutoff, min_count):
         """
-        This method preprocesses the review data, calculating positive-to-negative word ratios,
-        and building vocabularies for reviews and labels.
+        Preprocesses the review data, calculating positive-to-negative word ratios, and building vocabularies for reviews and labels.
+
+        Args:
+            reviews (list): List of reviews.
+            labels (list): Corresponding labels for the reviews.
+            polarity_cutoff (float): The absolute value of a word's positive-to-negative ratio must be at least this big to be considered.
+            min_count (int): Words should only be added to the vocabulary if they occur more than this many times.
         """
         # Calculate positive-to-negative ratios for words before building vocabulary
         pos_neg_ratios, total_counts = self._calculate_pos_neg_ratios(reviews, labels, min_count)
@@ -84,7 +103,15 @@ class SentimentNetwork:
 
     def _calculate_pos_neg_ratios(self, reviews, labels, min_count):
         """
-        This helper method calculates the positive to negative word ratios.
+        Helper method that calculates the positive to negative word ratios.
+
+        Args:
+            reviews (list): List of reviews.
+            labels (list): Corresponding labels for the reviews.
+            min_count (int): Words should only be counted if they occur more than this many times.
+
+        Returns:
+            tuple: A tuple containing the positive-to-negative ratios and total counts.
         """
         positive_counts = Counter()
         negative_counts = Counter()
@@ -112,6 +139,15 @@ class SentimentNetwork:
         return pos_neg_ratios, total_counts
 
     def init_network(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
+        """
+        Initializes the neural network with the given parameters.
+
+        Args:
+            input_nodes (int): Number of nodes in the input layer.
+            hidden_nodes (int): Number of nodes in the hidden layer.
+            output_nodes (int): Number of nodes in the output layer.
+            learning_rate (float): Learning rate to use while training.
+        """
         # Set number of nodes in input, hidden and output layers.
         self.input_nodes = input_nodes
         self.hidden_nodes = hidden_nodes
@@ -184,6 +220,16 @@ class SentimentNetwork:
         return [[self.word2index[word] for word in review.split() if word in self.word2index] for review in reviews]
 
     def train(self, training_reviews_raw: List[str], training_labels: List[str]):
+        """
+        Trains the neural network on review and label data.
+
+        Args:
+            training_reviews_raw (List[str]): The reviews to train on.
+            training_labels (List[str]): The labels associated with the training reviews.
+
+        Raises:
+            AssertionError: If the lengths of training reviews and training labels do not match.
+        """
         training_reviews = self.pre_process_reviews(training_reviews_raw)
 
         assert len(training_reviews) == len(training_labels)
@@ -234,6 +280,12 @@ class SentimentNetwork:
     def run(self, review: str) -> Label:
         """
         Returns a POSITIVE or NEGATIVE prediction for the given review.
+
+        Args:
+            review (str): The review to predict.
+
+        Returns:
+            Label: The predicted label, either Label.POSITIVE or Label.NEGATIVE.
         """
         self.layer_1 *= 0
         unique_indices = {self.word2index[word] for word in review.lower().split() if word in self.word2index}
@@ -247,8 +299,12 @@ class SentimentNetwork:
 
     def test(self, testing_reviews: List[str], testing_labels: List[str]):
         """
-        Attempts to predict the labels for the given testing_reviews,
-        and uses the test_labels to calculate the accuracy of those predictions.
+        Attempts to predict the labels for the given testing reviews,
+        and uses the testing_labels to calculate the accuracy of those predictions.
+
+        Args:
+            testing_reviews (List[str]): The reviews to test.
+            testing_labels (List[str]): The correct labels for the testing reviews.
         """
         correct = 0
         start = time.time()
