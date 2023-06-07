@@ -1,16 +1,22 @@
 """Console script for text_sentiment_analysis."""
-import sys
 import click
 
+from text_sentiment_analysis.main import train_sentiment_network
 
-@click.command()
-def main(args=None):
-    """Console script for text_sentiment_analysis."""
-    click.echo("Replace this message by putting your code into "
-               "text_sentiment_analysis.cli.main")
-    click.echo("See click documentation at https://click.palletsprojects.com/")
-    return 0
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
+def train_model():
+    """
+    Train a new model.
+    """
+    click.echo(f"Training model on reviews")
+    train_sentiment_network()
 
 
 if __name__ == "__main__":
-    sys.exit(main())  # pragma: no cover
+    train_model()

@@ -4,10 +4,10 @@
 
 
 import unittest
+
 from click.testing import CliRunner
 
-from text_sentiment_analysis import text_sentiment_analysis
-from text_sentiment_analysis import cli
+from text_sentiment_analysis import cli, main
 
 
 class TestText_sentiment_analysis(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestText_sentiment_analysis(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(cli.main)
         assert result.exit_code == 0
-        assert 'text_sentiment_analysis.cli.main' in result.output
-        help_result = runner.invoke(cli.main, ['--help'])
+        assert "text_sentiment_analysis.cli.main" in result.output
+        help_result = runner.invoke(cli.main, ["--help"])
         assert help_result.exit_code == 0
-        assert '--help  Show this message and exit.' in help_result.output
+        assert "--help  Show this message and exit." in help_result.output

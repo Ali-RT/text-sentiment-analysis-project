@@ -8,7 +8,7 @@ tox
 coverage
 Sphinx
 twine
-Click
+click
 black
 isort
 pre-commit
